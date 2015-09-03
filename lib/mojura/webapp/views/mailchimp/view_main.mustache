@@ -1,0 +1,59 @@
+<form id="{{urid}}_form" action="__api__/mailchimp" method="post" onsubmit="event.preventDefault()">
+
+	<input type="hidden" name="listid" value="{{options.listid}}" />
+
+	<div class="form-group">
+		<input type="text" name="email" data-validation="required email" class="form-control" placeholder="{{locale_str_system_email}}">
+	</div>
+	<div class="form-group">
+		<input type="text" name="firstname" data-validation="required" class="form-control" placeholder="{{locale_str_users_firstname}}">
+	</div>
+	<div class="form-group">
+		<input type="text" name="lastname" data-validation="required" class="form-control" placeholder="{{locale_str_users_lastname}}">
+	</div>
+
+	<button type="submit" class="btn btn-primary" data-loading-text='{{locale_str_system_sending}}' data-complete-text='{{locale_str_system_success}}'>
+		{{locale_str_system_send}}
+	</button>
+
+</form>
+
+<div id="{{urid}}_success" class="hidden alert alert-success">
+	{{locale_str_mailchimp_success}}
+</div>
+
+<script type="application/javascript">
+
+	(function() {
+
+		"use strict";
+
+		var $form = $("#{{urid}}_form");
+
+		$form.submit(function (event) {
+			event.preventDefault();
+			if (!Validator.validateForm($form[0])) {
+				return false;
+			}
+			var $btn = $(".btn-primary", $form);
+			$form.attr("method", "post");
+			$form.attr("action", "__api__/mailchimp");
+
+			$btn.button("loading");
+			$form.ajaxSubmit({
+				success: function () {
+					$btn.button("complete").addClass("btn-success disabled");
+					$form.remove();
+					$("#{{urid}}_success").removeClass("hidden");
+				},
+				error: function (e) {
+					$form.prepend($("<div class='alert alert-danger'>" + e.message + "</div>"))
+					$btn.button('reset');
+				}
+			});
+			return false;
+		});
+
+	})(jQuery);
+
+</script>

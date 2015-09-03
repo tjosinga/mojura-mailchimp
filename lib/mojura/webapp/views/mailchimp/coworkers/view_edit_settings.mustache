@@ -1,0 +1,25 @@
+<div class="form-group">
+	<label for="listid_{{urid}}">{{locale_str_mailchimp_listid}}</label>
+	<select id="listid_{{urid}}" class="form-control" data-validation="required" name="setting_listid">
+	</select>
+</div>
+
+<script type="text/javascript">
+
+	(function($) {
+		"use strict";
+
+		$.getJSON("__api__/mailchimp", function(data) {
+			var $listid = $("#listid_{{urid}}");
+			$.each(data, function (i, item) {
+				$listid.append($('<option>', {
+					value: item.id,
+					text : item.name
+				}));
+			});
+			$("option[value=" + {{settings_listid }} + "]", $listid).prop("selected", "selected");
+		});
+
+	})(jQuery);
+
+</script>
