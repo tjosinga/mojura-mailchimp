@@ -33,7 +33,8 @@ module MojuraAPI
 				 payload: payload
 				})
 			rescue => e
-				raise HTTPException.new(e.message)
+				json = e.response.nil? ? { 'detail' => e.message} : JSON.parse(e.response)
+				raise HTTPException.new(json['detail'])
 			end
 
 			data = JSON.parse(response)

@@ -32,6 +32,7 @@
 
 		$form.submit(function (event) {
 			event.preventDefault();
+			$(".alert", $form).remove();
 			if (!Validator.validateForm($form[0])) {
 				return false;
 			}
@@ -47,7 +48,11 @@
 					$("#{{urid}}_success").removeClass("hidden");
 				},
 				error: function (e) {
-					$form.prepend($("<div class='alert alert-danger'>" + e.message + "</div>"))
+					var message = e.responseJSON.error.message;
+					if (message.indexOf("already a list member") > 0) {
+						message = "{{locale_str_mailchimp_already_list_member}}";
+					}
+					$form.prepend($("<div class='alert alert-danger'>" + message + "</div>"));
 					$btn.button('reset');
 				}
 			});
