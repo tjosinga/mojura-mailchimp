@@ -16,7 +16,10 @@ module MojuraAPI
 		end
 
 		def get_from_mailchimp(api_url, method = :get, payload = nil)
-			api_key = Settings.get_s(:api_key, :mailchimp, '')
+			api_key = Settings.get_s(:api_key, :mailchimp)
+			if (api_key.empty?)
+				raise HTTPException.new('The api_key is not configured.')
+			end
 			data_center = api_key.scan(/\-(\w+)$/)[0][0]
 			url = "https://#{data_center}.api.mailchimp.com/3.0/" + api_url
 
@@ -30,8 +33,7 @@ module MojuraAPI
 				 payload: payload
 				})
 			rescue => e
-				raise e if e.response.nil?
-				response = e.response
+				raise HTTPException.new(e.message)
 			end
 
 			data = JSON.parse(response)
@@ -40,14 +42,14 @@ module MojuraAPI
 		end
 
 		def post(params)
-			request_json = {
+			request_json = JSON.generate({
 				email_address: params[:email],
 				status: 'pending',
 			  merge_fields: {
 				  FNAME: params[:firstname],
 			    LNAME: params[:lastname]
 			  }
-			}
+			})
 			api_url = "lists/#{params[:listid]}/members"
 			return get_from_mailchimp(api_url, :post, request_json)
 		end
